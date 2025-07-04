@@ -6,14 +6,19 @@ import 'package:kaya_app/core/routes/app_router.dart';
 import 'package:kaya_app/core/theme/app_theme.dart';
 import 'package:kaya_app/core/providers/auth_provider.dart';
 import 'package:kaya_app/core/providers/theme_provider.dart';
-import 'package:kaya_app/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize Firebase
+  // Initialize Firebase with custom options
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
+    options: const FirebaseOptions(
+      apiKey: 'AIzaSyCAxXT41Pg1TRGwqjCWBcNuLFS0EiSre_w',
+      appId: '1:631496909582:android:06fa0ff3c08563ec8f2d5f',
+      messagingSenderId: '631496909582',
+      projectId: 'kaya-d866f',
+      storageBucket: 'kaya-d866f.firebasestorage.app',
+    ),
   );
   
   // Initialize Firebase Analytics

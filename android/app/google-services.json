@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "631496909582",
+    "project_id": "kaya-d866f",
+    "storage_bucket": "kaya-d866f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:631496909582:android:06fa0ff3c08563ec8f2d5f",
+        "android_client_info": {
+          "package_name": "com.kaya.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "631496909582-enr07dijbef8vd0n1jpeo9jk74gg8ulu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAxXT41Pg1TRGwqjCWBcNuLFS0EiSre_w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "631496909582-enr07dijbef8vd0n1jpeo9jk74gg8ulu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

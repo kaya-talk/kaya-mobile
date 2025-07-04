@@ -17,8 +17,8 @@ dependencies:
   # Firebase
   firebase_core: ^2.24.2
   firebase_auth: ^4.15.3
-  firebase_messaging: ^14.7.10
-  firebase_analytics: ^10.7.4
+#  firebase_messaging: ^14.7.10
+#  firebase_analytics: ^10.7.4
   cloud_firestore: ^4.13.6
   
   # UI Components
@@ -48,9 +48,9 @@ dependencies:
   flutter_webrtc: ^0.9.47
   
   # Voice & Audio
-  record: ^5.0.4
-  audioplayers: ^5.2.1
-  permission_handler: ^11.1.0
+  # record: ^4.4.4
+  # audioplayers: ^5.2.1
+  # permission_handler: ^11.1.0
   
   # Utils
   intl: ^0.18.1
@@ -63,7 +63,7 @@ dependencies:
   
   # Push Notifications
   firebase_messaging: ^14.7.10
-  flutter_local_notifications: ^16.3.0
+  flutter_local_notifications: ^17.2.2
 
 dev_dependencies:
   flutter_test:
@@ -82,13 +82,13 @@ flutter:
     - assets/animations/
     - assets/sounds/
   
-  fonts:
-    - family: Inter
-      fonts:
-        - asset: assets/fonts/Inter-Regular.ttf
-        - asset: assets/fonts/Inter-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/Inter-SemiBold.ttf
-          weight: 600
-        - asset: assets/fonts/Inter-Bold.ttf
-          weight: 700 
+#  fonts:
+#    - family: Inter
+#      fonts:
+#        - asset: assets/fonts/Inter-Regular.ttf
+#        - asset: assets/fonts/Inter-Medium.ttf
+#          weight: 500
+#        - asset: assets/fonts/Inter-SemiBold.ttf
+#          weight: 600
+#        - asset: assets/fonts/Inter-Bold.ttf
+#          weight: 700 
