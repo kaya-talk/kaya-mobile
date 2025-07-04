@@ -80,41 +80,14 @@ class _SplashScreenState extends State<SplashScreen>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Logo/Icon
-                    Container(
+                    // Kaya logo
+                    Image.asset(
+                      'assets/images/kaya-logo.png',
                       width: 120,
                       height: 120,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(30),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.psychology,
-                        size: 60,
-                        color: AppTheme.primaryColor,
-                      ),
+                      fit: BoxFit.contain,
                     ),
-                    const SizedBox(height: 32),
-                    
-                    // App Name
-                    const Text(
-                      'Kaya',
-                      style: TextStyle(
-                        fontSize: 48,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontFamily: 'Inter',
-                      ),
-                    ),
-                    
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 40),
                     
                     // Tagline
                     const Text(

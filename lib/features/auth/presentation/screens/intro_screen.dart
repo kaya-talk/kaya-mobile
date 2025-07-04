@@ -63,12 +63,12 @@ class _IntroScreenState extends State<IntroScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      context.go('/signup');
+      context.go('/login');
     }
   }
 
   void _skipIntro() {
-    context.go('/signup');
+    context.go('/login');
   }
 
   @override

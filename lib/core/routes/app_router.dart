@@ -19,6 +19,8 @@ import 'package:kaya_app/features/calendar/presentation/screens/calendar_screen.
 import 'package:kaya_app/features/hold_space/presentation/screens/hold_space_screen.dart';
 import 'package:kaya_app/features/settings/presentation/screens/settings_screen.dart';
 import 'package:kaya_app/features/import_export/presentation/screens/import_export_screen.dart';
+import 'package:kaya_app/features/auth/presentation/screens/reset_password_screen.dart';
+import 'package:kaya_app/features/auth/presentation/screens/reset_password_sent_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -38,14 +40,14 @@ class AppRouter {
         builder: (context, state) => const IntroScreen(),
       ),
       GoRoute(
-        path: '/signup',
-        name: 'signup',
-        builder: (context, state) => const SignupScreen(),
-      ),
-      GoRoute(
         path: '/login',
         name: 'login',
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/signup',
+        name: 'signup',
+        builder: (context, state) => const SignupScreen(),
       ),
       GoRoute(
         path: '/email-confirmation',
@@ -141,6 +143,18 @@ class AppRouter {
         path: '/import-export',
         name: 'import-export',
         builder: (context, state) => const ImportExportScreen(),
+      ),
+      
+      // Reset Password Routes
+      GoRoute(
+        path: '/reset-password',
+        name: 'reset-password',
+        builder: (context, state) => const ResetPasswordScreen(),
+      ),
+      GoRoute(
+        path: '/reset-password-sent',
+        name: 'reset-password-sent',
+        builder: (context, state) => const ResetPasswordSentScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
