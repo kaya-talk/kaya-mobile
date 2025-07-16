@@ -53,71 +53,40 @@ class AuthProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
 
-      // First, create user in Firebase Auth
+      // 1. Create user in Firebase Auth
       final UserCredential result = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      print("============================== result");
-      print(result);
+      // 2. Get ID token from Firebase user
+      final idToken = await result.user!.getIdToken();
+      if (idToken == null) {
+        _error = 'Failed to get ID token from Firebase.';
+        notifyListeners();
+        return;
+      }
 
-      if (result.user != null) {
-        // Update display name in Firebase
-        if (displayName != null) {
-          await result.user!.updateDisplayName(displayName);
-        }
+      // 3. Call backend to store user info in DB
+      final response = await _apiService.signUp(
+        idToken: idToken!,
+        displayName: displayName,
+      );
 
-        // Create user in backend
-        final response = await _apiService.signUp(
-          email: email,
-          password: password,
-          displayName: displayName,
-        );
-
-        print('Backend signup response: $response'); // Debug log
-
-        if (response['success']) {
-          try {
-            // Parse user data with error handling
-            final userData = response['data']['user'];
-            print('Backend user data: $userData'); // Debug log
-            print('User data type: ${userData.runtimeType}'); // Debug log
-
-            if (userData is Map<String, dynamic>) {
-              print('Parsing user data...'); // Debug log
-              _user = UserModel.fromJson(userData);
-              print('User model created successfully'); // Debug log
-
-              // Store user data in shared preferences
-              await _saveUserData();
-
-              // Sign in with custom token for immediate access
-              final customToken = response['data']['customToken'];
-              await _auth.signInWithCustomToken(customToken);
-
-              // Send email verification
-              await result.user!.sendEmailVerification();
-            } else {
-              throw Exception('Invalid user data format: ${userData.runtimeType}');
-            }
-          } catch (parseError) {
-            print('Error parsing user data: $parseError');
-            print('Parse error type: ${parseError.runtimeType}');
-            _error = 'Failed to parse user data: ${parseError.toString()}';
-            // Don't delete the user, just show the error
-          }
-        } else {
-          // Backend signup failed, delete Firebase user
-          await result.user!.delete();
-          _error = response['error']?['message'] ?? 'Signup failed';
-        }
+      // 4. Handle backend response as needed
+      if (response['success']) {
+        // Optionally parse and store user data
+        final userData = response['data']['user'];
+        _user = UserModel.fromJson(userData);
+        await _saveUserData();
+      } else {
+        _error = response['error']?['message'] ?? 'Signup failed';
+        // Optionally delete Firebase user if backend fails
+        await result.user!.delete();
       }
     } on FirebaseAuthException catch (e) {
       _error = _getFirebaseErrorMessage(e.code);
     } catch (e) {
-      print('Signup error: $e');
-      print('Error type: ${e.runtimeType}');
       _error = 'An unexpected error occurred: ${e.toString()}';
     } finally {
       _isLoading = false;

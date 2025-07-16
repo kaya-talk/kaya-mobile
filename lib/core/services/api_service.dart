@@ -104,26 +104,17 @@ class ApiService {
   
   // Authentication endpoints
   Future<Map<String, dynamic>> signUp({
-    required String email,
-    required String password,
+    required String idToken,
     String? displayName,
   }) async {
     try {
       final response = await _dio.post(
         '/auth/signup',
         data: {
-          'email': email,
-          'password': password,
+          'idToken': idToken,
           if (displayName != null) 'displayName': displayName,
         },
       );
-      
-      if (response.data['success']) {
-        // Store the custom token for immediate login
-        final customToken = response.data['data']['customToken'];
-        await _setAuthToken(customToken);
-      }
-      
       return response.data;
     } on DioException catch (e) {
       throw _handleDioError(e);
