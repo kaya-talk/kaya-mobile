@@ -226,7 +226,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       // Forgot password link
                       Center(
                         child: GestureDetector(
-                          onTap: _resetPassword,
+                          onTap: () => context.go('/reset-password'),
                           child: const Text(
                             'Forgot password?',
                             style: TextStyle(

@@ -59,7 +59,12 @@ class AuthProvider extends ChangeNotifier {
         password: password,
       );
 
-      // 2. Get ID token from Firebase user
+      // 2. Send email verification
+      if (!result.user!.emailVerified) {
+        await result.user!.sendEmailVerification();
+      }
+
+      // 3. Get ID token from Firebase user
       final idToken = await result.user!.getIdToken();
       if (idToken == null) {
         _error = 'Failed to get ID token from Firebase.';
@@ -67,21 +72,19 @@ class AuthProvider extends ChangeNotifier {
         return;
       }
 
-      // 3. Call backend to store user info in DB
+      // 4. Call backend to store user info in DB
       final response = await _apiService.signUp(
         idToken: idToken!,
         displayName: displayName,
       );
 
-      // 4. Handle backend response as needed
+      // 5. Handle backend response as needed
       if (response['success']) {
-        // Optionally parse and store user data
         final userData = response['data']['user'];
         _user = UserModel.fromJson(userData);
         await _saveUserData();
       } else {
         _error = response['error']?['message'] ?? 'Signup failed';
-        // Optionally delete Firebase user if backend fails
         await result.user!.delete();
       }
     } on FirebaseAuthException catch (e) {
@@ -92,6 +95,17 @@ class AuthProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  /// Checks and reloads the user's email verification status
+  Future<bool> checkEmailVerified() async {
+    if (_firebaseUser != null) {
+      await _firebaseUser!.reload();
+      _firebaseUser = _auth.currentUser;
+      notifyListeners();
+      return _firebaseUser!.emailVerified;
+    }
+    return false;
   }
 
   Future<void> signIn({
@@ -146,16 +160,12 @@ class AuthProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
 
-      // Use backend reset password endpoint
-      final response = await _apiService.resetPassword(email);
-      
-      if (!response['success']) {
-        _error = response['error']?['message'] ?? 'Failed to send reset email';
-      }
+      // Use Firebase Auth to send reset password email
+      await _auth.sendPasswordResetEmail(email: email);
     } on FirebaseAuthException catch (e) {
       _error = _getFirebaseErrorMessage(e.code);
     } catch (e) {
-      _error = 'An unexpected error occurred: ${e.toString()}';
+      _error = 'An unexpected error occurred:  [${e.toString()}';
     } finally {
       _isLoading = false;
       notifyListeners();
