@@ -5,6 +5,7 @@ import 'package:kaya_app/features/auth/presentation/screens/intro_screen.dart';
 import 'package:kaya_app/features/auth/presentation/screens/signup_screen.dart';
 import 'package:kaya_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:kaya_app/features/auth/presentation/screens/email_confirmation_screen.dart';
+import 'package:kaya_app/features/auth/presentation/screens/auth_test_screen.dart';
 import 'package:kaya_app/features/onboarding/presentation/screens/vibe_selector_screen.dart';
 import 'package:kaya_app/features/home/presentation/screens/home_screen.dart';
 import 'package:kaya_app/features/chat/presentation/screens/chat_screen.dart';
@@ -53,6 +54,11 @@ class AppRouter {
         path: '/email-confirmation',
         name: 'email-confirmation',
         builder: (context, state) => const EmailConfirmationScreen(),
+      ),
+      GoRoute(
+        path: '/auth-test',
+        name: 'auth-test',
+        builder: (context, state) => const AuthTestScreen(),
       ),
       
       // Onboarding Routes

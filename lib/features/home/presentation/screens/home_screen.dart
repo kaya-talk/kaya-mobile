@@ -125,6 +125,11 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.all(16),
           sliver: SliverList(
             delegate: SliverChildListDelegate([
+              // Test button for auth system
+              _buildTestButton(),
+              
+              const SizedBox(height: 24),
+              
               // Quick actions
               _buildQuickActions(),
               
@@ -146,6 +151,47 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildTestButton() {
+    return Card(
+      color: Colors.orange.shade100,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.bug_report, color: Colors.orange.shade700),
+                const SizedBox(width: 8),
+                const Text(
+                  'Auth Test',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Test the authentication system and backend integration',
+              style: TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () => context.go('/auth-test'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange.shade600,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Open Auth Test'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

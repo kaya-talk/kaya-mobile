@@ -40,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please enter your email address first'),
-          backgroundColor: AppTheme.warningColor,
+          backgroundColor: Colors.orange,
         ),
       );
       return;
@@ -52,19 +52,25 @@ class _LoginScreenState extends State<LoginScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Password reset email sent. Please check your inbox.'),
-        backgroundColor: AppTheme.successColor,
+        backgroundColor: Colors.green,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: const Color(0xFF2E1065),
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, child) {
+          if (authProvider.isLoading) {
+            return const Center(
+              child: CircularProgressIndicator(
+                color: Colors.white,
+              ),
+            );
+          }
+          
           return Container(
             width: double.infinity,
             height: double.infinity,
@@ -112,6 +118,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(color: Colors.white),
                           ),
+                          errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Colors.red),
+                          ),
                         ),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
@@ -147,6 +157,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(color: Colors.white),
                           ),
+                          errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Colors.red),
+                          ),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscurePassword ? Icons.visibility : Icons.visibility_off,
@@ -166,114 +180,92 @@ class _LoginScreenState extends State<LoginScreen> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 28),
-                      // Enter button
-                      SizedBox(
-                        height: 54,
-                        child: ElevatedButton(
-                          onPressed: _signIn,
-                          style: ElevatedButton.styleFrom(
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(28),
-                            ),
-                            padding: EdgeInsets.zero,
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                          ).copyWith(
-                            backgroundColor: MaterialStateProperty.resolveWith<Color?>((states) => null),
-                            foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                          ),
-                          child: Ink(
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFFB6A9E5), Color(0xFFF7B7D7)],
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                              ),
-                              borderRadius: BorderRadius.circular(28),
-                            ),
-                            child: Container(
-                              alignment: Alignment.center,
-                              height: 54,
-                              child: const Text(
-                                'Enter Kaya',
-                                style: TextStyle(
-                                  color: Color.fromARGB(255, 125, 101, 212),
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w400,
-                                  fontFamily: 'Inter',
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      // Forgot password
-                      Center(
-                        child: TextButton(
-                          onPressed: () => context.go('/reset-password'),
-                          child: const Text(
-                            'Forgot password?',
-                            style: TextStyle(
-                              color: Color(0xFFB6A9E5),
-                              fontSize: 13,
-                              fontFamily: 'Inter',
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      // Sign up link
-                      Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              'New to Kaya? ',
-                              style: TextStyle(
-                                color: Color(0xFFB6A9E5),
-                                fontSize: 13,
-                                fontFamily: 'Inter',
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () => context.go('/signup'),
-                              child: const Text(
-                                'Sign up now',
-                                style: TextStyle(
-                                  color: Color(0xFFF7B7D7),
-                                  fontSize: 13,
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (authProvider.error != null) ...[
-                        const SizedBox(height: 16),
+                      const SizedBox(height: 16),
+                      
+                      // Error message
+                      if (authProvider.error != null)
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: AppTheme.errorColor.withOpacity(0.1),
+                            color: Colors.red.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: AppTheme.errorColor.withOpacity(0.3)),
+                            border: Border.all(color: Colors.red.withOpacity(0.3)),
                           ),
                           child: Text(
                             authProvider.error!,
                             style: const TextStyle(
-                              color: AppTheme.errorColor,
+                              color: Colors.red,
                               fontSize: 14,
                               fontFamily: 'Inter',
                             ),
-                            textAlign: TextAlign.center,
                           ),
                         ),
-                      ],
+                      
+                      const SizedBox(height: 28),
+                      // Enter button
+                      ElevatedButton(
+                        onPressed: _signIn,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: const Color(0xFF2E1065),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Enter Kaya',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'Inter',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      // Forgot password link
+                      Center(
+                        child: GestureDetector(
+                          onTap: _resetPassword,
+                          child: const Text(
+                            'Forgot password?',
+                            style: TextStyle(
+                              color: Colors.white54,
+                              fontSize: 14,
+                              fontFamily: 'Inter',
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 32),
+                      // Sign up link
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "Don't have an account? ",
+                            style: TextStyle(
+                              color: Colors.white54,
+                              fontSize: 14,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => context.go('/signup'),
+                            child: const Text(
+                              'Sign up',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'Inter',
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 40),
                     ],
                   ),
                 ),

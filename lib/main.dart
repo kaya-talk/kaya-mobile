@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
+// import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:provider/provider.dart';
 import 'package:kaya_app/core/routes/app_router.dart';
 import 'package:kaya_app/core/theme/app_theme.dart';
 import 'package:kaya_app/core/providers/auth_provider.dart';
 import 'package:kaya_app/core/providers/theme_provider.dart';
+import 'package:kaya_app/core/providers/user_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,7 +23,7 @@ void main() async {
   );
   
   // Initialize Firebase Analytics
-  await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
+  // await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
   
   runApp(const KayaApp());
 }
@@ -36,6 +37,7 @@ class KayaApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
