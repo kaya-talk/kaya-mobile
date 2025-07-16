@@ -425,6 +425,10 @@ class _GuideStepState extends State<_GuideStep> {
     _GuideOption('Thomas', 'Wise counselor, 58', 'assets/images/guide_thomas.png'),
   ];
 
+  void _finishOnboarding() {
+    context.go('/home');
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -620,7 +624,7 @@ class _GuideStepState extends State<_GuideStep> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: widget.onNext,
+              onPressed: _finishOnboarding,
               icon: const Icon(Icons.check_circle_outline, color: Colors.black),
               label: const Text('Create My Guide', style: TextStyle(color: Colors.black)),
               style: ElevatedButton.styleFrom(
@@ -638,7 +642,7 @@ class _GuideStepState extends State<_GuideStep> {
           // Skip button
           Center(
             child: TextButton(
-              onPressed: widget.onNext,
+              onPressed: _finishOnboarding,
               child: const Text(
                 'Skip for now and use default guide',
                 style: TextStyle(
