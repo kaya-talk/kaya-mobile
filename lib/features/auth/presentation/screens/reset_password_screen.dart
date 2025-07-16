@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kaya_app/core/theme/app_theme.dart';
+import 'package:provider/provider.dart';
+import 'package:kaya_app/core/providers/auth_provider.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -20,12 +22,26 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   }
 
   void _submit() async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty) return;
     setState(() => _isLoading = true);
-    // Simulate sending reset link
-    await Future.delayed(const Duration(seconds: 1));
-    setState(() => _isLoading = false);
-    if (mounted) {
-      context.go('/reset-password-sent');
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    try {
+      await authProvider.resetPassword(email);
+      if (mounted) {
+        context.go('/reset-password-sent');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to send reset email. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
