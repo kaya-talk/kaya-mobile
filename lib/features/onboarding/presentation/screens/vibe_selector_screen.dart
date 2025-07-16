@@ -621,17 +621,31 @@ class _GuideStepState extends State<_GuideStep> {
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: widget.onNext,
-              icon: const Icon(Icons.check_circle_outline),
-              label: const Text('Create My Guide'),
+              icon: const Icon(Icons.check_circle_outline, color: Colors.black),
+              label: const Text('Create My Guide', style: TextStyle(color: Colors.black)),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                backgroundColor: const Color(0xFF8B5CF6),
-                foregroundColor: Colors.white,
+                backgroundColor: const Color(0xFFD6C7F7),
+                foregroundColor: Colors.black,
                 textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 elevation: 0,
+              ),
+            ),
+          ),
+          // Skip button
+          Center(
+            child: TextButton(
+              onPressed: widget.onNext,
+              child: const Text(
+                'Skip for now and use default guide',
+                style: TextStyle(
+                  color: Color(0xFFB6A9E5),
+                  fontSize: 15,
+                  decoration: TextDecoration.underline,
+                ),
               ),
             ),
           ),
