@@ -53,6 +53,12 @@ class _SignupScreenState extends State<SignupScreen> {
       backgroundColor: const Color(0xFF2E1065),
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, child) {
+          // Navigation after successful signup
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!authProvider.isLoading && authProvider.error == null && authProvider.user != null) {
+              context.go('/email-confirmation');
+            }
+          });
           if (authProvider.isLoading) {
             return const Center(
               child: CircularProgressIndicator(
