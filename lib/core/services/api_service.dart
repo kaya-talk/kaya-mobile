@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ApiService {
   static const String baseUrl = 'http://10.0.2.2:3000/api/v1';
@@ -173,7 +174,12 @@ class ApiService {
   
   Future<Map<String, dynamic>> getCurrentUser() async {
     try {
-      await _addAuthHeader();
+      // Always get the latest Firebase ID token
+      final user = FirebaseAuth.instance.currentUser;
+      final idToken = await user?.getIdToken(true);
+      if (idToken != null) {
+        _dio.options.headers['Authorization'] = 'Bearer $idToken';
+      }
       final response = await _dio.get('/auth/me');
       return response.data;
     } on DioException catch (e) {

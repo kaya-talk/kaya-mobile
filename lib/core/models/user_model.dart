@@ -53,8 +53,20 @@ class UserModel {
       }
     }
 
+    // Robust id parsing (string or int)
+    String idValue = '';
+    if (json['id'] != null) {
+      if (json['id'] is int) {
+        idValue = json['id'].toString();
+      } else if (json['id'] is String) {
+        idValue = json['id'];
+      } else {
+        idValue = json['id'].toString();
+      }
+    }
+
     return UserModel(
-      id: json['id']?.toString() ?? '',
+      id: idValue,
       uid: json['uid']?.toString() ?? '',
       email: json['email']?.toString() ?? '',
       displayName: json['displayName']?.toString(),
@@ -125,12 +137,17 @@ class UserStatistics {
   });
 
   factory UserStatistics.fromJson(Map<String, dynamic> json) {
+    int parseInt(dynamic value) {
+      if (value is int) return value;
+      if (value is String) return int.tryParse(value) ?? 0;
+      return 0;
+    }
     return UserStatistics(
-      chatMessagesCount: json['chatMessagesCount'] ?? 0,
-      journalEntriesCount: json['journalEntriesCount'] ?? 0,
-      glowNotesCount: json['glowNotesCount'] ?? 0,
-      lettersCount: json['lettersCount'] ?? 0,
-      calendarEventsCount: json['calendarEventsCount'] ?? 0,
+      chatMessagesCount: parseInt(json['chatMessagesCount']),
+      journalEntriesCount: parseInt(json['journalEntriesCount']),
+      glowNotesCount: parseInt(json['glowNotesCount']),
+      lettersCount: parseInt(json['lettersCount']),
+      calendarEventsCount: parseInt(json['calendarEventsCount']),
     );
   }
 

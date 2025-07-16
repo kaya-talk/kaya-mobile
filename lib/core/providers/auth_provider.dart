@@ -123,13 +123,12 @@ class AuthProvider extends ChangeNotifier {
         password: password,
       );
 
-      // No backend verification
-      // Optionally, set _user to null or fetch from local storage if needed
-      _user = null;
+      // Fetch backend user data after sign-in
+      await refreshUserData();
     } on FirebaseAuthException catch (e) {
       _error = _getFirebaseErrorMessage(e.code);
     } catch (e) {
-      _error = 'An unexpected error occurred: ${e.toString()}';
+      _error = 'An unexpected error occurred:  ${e.toString()}';
     } finally {
       _isLoading = false;
       notifyListeners();

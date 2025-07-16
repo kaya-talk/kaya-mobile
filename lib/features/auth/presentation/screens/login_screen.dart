@@ -63,6 +63,12 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: const Color(0xFF2E1065),
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, child) {
+          // Navigation after successful sign-in
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!authProvider.isLoading && authProvider.error == null && authProvider.user != null) {
+              context.go('/vibe-selector');
+            }
+          });
           if (authProvider.isLoading) {
             return const Center(
               child: CircularProgressIndicator(
