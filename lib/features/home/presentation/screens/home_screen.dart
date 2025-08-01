@@ -90,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 childAspectRatio: 1.3,
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  _QuickAction(icon: Icons.chat_bubble_outline, label: 'Talk to Kaya', onTap: () {}),
+                  _QuickAction(icon: Icons.chat_bubble_outline, label: 'Talk to Kaya', onTap: () => context.pushNamed('presence-selection')),
                   _QuickAction(icon: Icons.edit_note, label: 'Write Journal', onTap: () {}),
                   _QuickAction(icon: Icons.favorite_border, label: 'Write Glow Note', onTap: () {}),
                   _QuickAction(icon: Icons.mail_outline, label: 'Write Letter', onTap: () {}),

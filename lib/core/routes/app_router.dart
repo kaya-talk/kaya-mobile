@@ -9,6 +9,7 @@ import 'package:kaya_app/features/auth/presentation/screens/auth_test_screen.dar
 import 'package:kaya_app/features/onboarding/presentation/screens/vibe_selector_screen.dart';
 import 'package:kaya_app/features/home/presentation/screens/home_screen.dart';
 import 'package:kaya_app/features/chat/presentation/screens/chat_screen.dart';
+import 'package:kaya_app/features/chat/presentation/screens/presence_selection_screen.dart';
 import 'package:kaya_app/features/journal/presentation/screens/journal_home_screen.dart';
 import 'package:kaya_app/features/journal/presentation/screens/journal_compose_screen.dart';
 import 'package:kaya_app/features/journal/presentation/screens/journal_archive_screen.dart';
@@ -77,9 +78,14 @@ class AppRouter {
       
       // Chat Routes
       GoRoute(
+        path: '/presence-selection',
+        name: 'presence-selection',
+        builder: (context, state) => const PresenceSelectionScreen(),
+      ),
+      GoRoute(
         path: '/chat',
         name: 'chat',
-        builder: (context, state) => const ChatScreen(),
+        builder: (context, state) => ChatScreen(extra: state.extra as Map<String, dynamic>?),
       ),
       
       // Journal Routes
@@ -168,25 +174,16 @@ class AppRouter {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red,
-            ),
+            const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: 16),
             Text(
-              'Page not found',
-              style: Theme.of(context).textTheme.headlineMedium,
+              'Page not found: ${state.uri.path}',
+              style: const TextStyle(fontSize: 18),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'The page you are looking for does not exist.',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => context.go('/home'),
-              child: const Text('Go Home'),
+              child: const Text('Go to Home'),
             ),
           ],
         ),
