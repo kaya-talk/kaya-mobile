@@ -92,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   _QuickAction(icon: Icons.chat_bubble_outline, label: 'Talk to Kaya', onTap: () => context.pushNamed('presence-selection')),
                   _QuickAction(icon: Icons.edit_note, label: 'Write Journal', onTap: () => context.pushNamed('journal-compose')),
-                  _QuickAction(icon: Icons.favorite_border, label: 'Write Glow Note', onTap: () {}),
+                  _QuickAction(icon: Icons.favorite_border, label: 'Write Glow Note', onTap: () => context.pushNamed('glow-notes-compose')),
                   _QuickAction(icon: Icons.mail_outline, label: 'Write Letter', onTap: () {}),
                 ],
               ),
@@ -176,6 +176,9 @@ class _HomeScreenState extends State<HomeScreen> {
           } else if (index == 2) {
             // Journal button - navigate to journal history
             context.pushNamed('journal');
+          } else if (index == 4) {
+            // Glow button - navigate to glow notes home
+            context.pushNamed('glow-notes');
           } else {
             setState(() {
               _selectedIndex = index;
