@@ -13,6 +13,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  String? _selectedMood; // Track selected mood
 
   final List<_NavItem> _navItems = [
     _NavItem(Icons.home, 'Home'),
@@ -21,6 +22,13 @@ class _HomeScreenState extends State<HomeScreen> {
     _NavItem(Icons.mail_outline, 'Letters'),
     _NavItem(Icons.favorite_border, 'Glow'),
     _NavItem(Icons.person_outline, 'Profile'),
+  ];
+
+  final List<_MoodData> _moodOptions = [
+    _MoodData(icon: Icons.self_improvement, label: 'Calm', value: 'calm'),
+    _MoodData(icon: Icons.sentiment_neutral, label: 'Neutral', value: 'neutral'),
+    _MoodData(icon: Icons.sentiment_dissatisfied, label: 'Sad', value: 'sad'),
+    _MoodData(icon: Icons.sentiment_very_dissatisfied, label: 'Angry', value: 'angry'),
   ];
 
   @override
@@ -70,12 +78,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: const [
-                    _MoodOption(icon: Icons.self_improvement, label: 'Calm'),
-                    _MoodOption(icon: Icons.sentiment_neutral, label: 'Neutral'),
-                    _MoodOption(icon: Icons.sentiment_dissatisfied, label: 'Sad'),
-                    _MoodOption(icon: Icons.sentiment_very_dissatisfied, label: 'Angry'),
-                  ],
+                  children: _moodOptions.map((mood) => _SelectableMoodOption(
+                    icon: mood.icon,
+                    label: mood.label,
+                    value: mood.value,
+                    isSelected: _selectedMood == mood.value,
+                    onTap: () {
+                      setState(() {
+                        _selectedMood = _selectedMood == mood.value ? null : mood.value;
+                      });
+                    },
+                  )).toList(),
                 ),
               ),
               const SizedBox(height: 28),
@@ -219,6 +232,69 @@ class _MoodOption extends StatelessWidget {
         const SizedBox(height: 6),
         Text(label, style: const TextStyle(color: Color(0xFFB6A9E5), fontSize: 13)),
       ],
+    );
+  }
+}
+
+class _MoodData {
+  final IconData icon;
+  final String label;
+  final String value;
+  
+  const _MoodData({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+}
+
+class _SelectableMoodOption extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final bool isSelected;
+  final VoidCallback onTap;
+  
+  const _SelectableMoodOption({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.isSelected,
+    required this.onTap,
+  });
+  
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: isSelected ? const Color(0xFFB6A9E5) : const Color(0xFF4B2996),
+              borderRadius: BorderRadius.circular(12),
+              border: isSelected 
+                ? Border.all(color: Colors.white, width: 2)
+                : null,
+            ),
+            child: Icon(
+              icon, 
+              color: isSelected ? const Color(0xFF2E1065) : const Color(0xFFB6A9E5), 
+              size: 28
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            label, 
+            style: TextStyle(
+              color: isSelected ? Colors.white : const Color(0xFFB6A9E5), 
+              fontSize: 13,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            )
+          ),
+        ],
+      ),
     );
   }
 }
