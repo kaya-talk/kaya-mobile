@@ -41,10 +41,24 @@ class _JournalHomeScreenState extends State<JournalHomeScreen> {
             // Header
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: const Row(
+              child: Row(
                 children: [
-                  Text(
-                    'Journal History',
+                  Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFB6A9E5),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Icon(
+                      Icons.book,
+                      color: Color(0xFF2E1065),
+                      size: 16,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Where your thoughts land.',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -62,35 +76,6 @@ class _JournalHomeScreenState extends State<JournalHomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Main heading with icon
-                    Row(
-                      children: [
-                        Container(
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFB6A9E5),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: const Icon(
-                            Icons.book,
-                            color: Color(0xFF2E1065),
-                            size: 16,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'Where your thoughts land.',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    
                     // Description
                     const Text(
                       "You've been here before — with questions, with weight, with wonder. Each entry is a shape you gave to something that once had none.",

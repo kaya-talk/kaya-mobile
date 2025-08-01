@@ -40,8 +40,14 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: const Row(
                 children: [
+                  Icon(
+                    Icons.chat_bubble_outline,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                  SizedBox(width: 8),
                   Text(
-                    'Chat History',
+                    'Your open conversations.',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -59,27 +65,6 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Main heading
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.chat_bubble_outline,
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'Your open conversations.',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    
                     // Description
                     const Text(
                       'These are the spaces you\'ve spoken into — in fragments, in full, or just to breathe. Some chats stay open. Some close on their own. You don\'t have to finish anything. You just have to show up.',
