@@ -91,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
                   _QuickAction(icon: Icons.chat_bubble_outline, label: 'Talk to Kaya', onTap: () => context.pushNamed('presence-selection')),
-                  _QuickAction(icon: Icons.edit_note, label: 'Write Journal', onTap: () {}),
+                  _QuickAction(icon: Icons.edit_note, label: 'Write Journal', onTap: () => context.pushNamed('journal-compose')),
                   _QuickAction(icon: Icons.favorite_border, label: 'Write Glow Note', onTap: () {}),
                   _QuickAction(icon: Icons.mail_outline, label: 'Write Letter', onTap: () {}),
                 ],
@@ -173,6 +173,9 @@ class _HomeScreenState extends State<HomeScreen> {
           if (index == 1) {
             // Talk button - navigate to chat history
             context.pushNamed('chat-history');
+          } else if (index == 2) {
+            // Journal button - navigate to journal history
+            context.pushNamed('journal');
           } else {
             setState(() {
               _selectedIndex = index;
