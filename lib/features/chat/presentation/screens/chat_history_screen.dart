@@ -319,7 +319,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
             context.pushNamed('journal');
           } else if (index == 3) {
             // Letters button
-            context.pushNamed('letters-compose');
+            context.pushNamed('letters');
           } else if (index == 4) {
             // Glow button
             context.pushNamed('glow-notes');

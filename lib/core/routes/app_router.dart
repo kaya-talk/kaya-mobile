@@ -124,11 +124,11 @@ class AppRouter {
       ),
       
       // Letters Routes
-      // GoRoute(
-      //   path: '/letters',
-      //   name: 'letters',
-      //   builder: (context, state) => const LettersHomeScreen(),
-      // ),
+      GoRoute(
+        path: '/letters',
+        name: 'letters',
+        builder: (context, state) => const LettersHomeScreen(),
+      ),
       GoRoute(
         path: '/letters/compose',
         name: 'letters-compose',

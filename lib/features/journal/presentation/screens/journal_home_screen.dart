@@ -329,7 +329,7 @@ class _JournalHomeScreenState extends State<JournalHomeScreen> {
             // Do nothing, already selected
           } else if (index == 3) {
             // Letters button
-            context.pushNamed('letters-compose');
+            context.pushNamed('letters');
           } else if (index == 4) {
             // Glow button
             context.pushNamed('glow-notes');
