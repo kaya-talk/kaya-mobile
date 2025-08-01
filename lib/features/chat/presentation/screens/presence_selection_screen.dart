@@ -70,9 +70,9 @@ class _PresenceSelectionScreenState extends State<PresenceSelectionScreen> {
               ),
             ),
             
-            // Scrollable content
+            // Scrollable content - everything together
             Expanded(
-              child: Padding(
+              child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,78 +103,80 @@ class _PresenceSelectionScreenState extends State<PresenceSelectionScreen> {
                     const SizedBox(height: 32),
                     
                     // Presence options
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: _presenceOptions.length,
-                        itemBuilder: (context, index) {
-                          final option = _presenceOptions[index];
-                          final isSelected = _selectedPresence == option.id;
-                          
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _selectedPresence = option.id;
-                                });
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                  color: isSelected 
-                                      ? const Color(0xFF4B2996) 
-                                      : const Color(0xFF3B2170),
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: isSelected 
-                                      ? Border.all(color: const Color(0xFFB6A9E5), width: 2)
-                                      : null,
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFF2E1065),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Icon(
-                                        option.icon,
-                                        color: const Color(0xFFB6A9E5),
-                                        size: 24,
-                                      ),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _presenceOptions.length,
+                      itemBuilder: (context, index) {
+                        final option = _presenceOptions[index];
+                        final isSelected = _selectedPresence == option.id;
+                        
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedPresence = option.id;
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: isSelected 
+                                    ? const Color(0xFF4B2996) 
+                                    : const Color(0xFF3B2170),
+                                borderRadius: BorderRadius.circular(16),
+                                border: isSelected 
+                                    ? Border.all(color: const Color(0xFFB6A9E5), width: 2)
+                                    : null,
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF2E1065),
+                                      borderRadius: BorderRadius.circular(12),
                                     ),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            option.title,
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            option.description,
-                                            style: const TextStyle(
-                                              color: Color(0xFFB6A9E5),
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                    child: Icon(
+                                      option.icon,
+                                      color: const Color(0xFFB6A9E5),
+                                      size: 24,
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          option.title,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          option.description,
+                                          style: const TextStyle(
+                                            color: Color(0xFFB6A9E5),
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                        );
+                      },
                     ),
+                    
+                    const SizedBox(height: 32),
                     
                     // Bottom buttons
                     Padding(
@@ -185,7 +187,11 @@ class _PresenceSelectionScreenState extends State<PresenceSelectionScreen> {
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              onPressed: () => _navigateToChat(_selectedPresence),
+                              onPressed: () {
+                                if (_selectedPresence != null) {
+                                  _navigateToChat(_selectedPresence);
+                                }
+                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF4B2996),
                                 foregroundColor: Colors.white,
@@ -195,11 +201,14 @@ class _PresenceSelectionScreenState extends State<PresenceSelectionScreen> {
                                 ),
                                 elevation: 0,
                               ),
-                              child: const Text(
+                              child: Text(
                                 'This feels right',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
+                                  color: _selectedPresence != null 
+                                      ? Colors.white 
+                                      : const Color(0xFFC7B2DE),
                                 ),
                               ),
                             ),
@@ -213,7 +222,7 @@ class _PresenceSelectionScreenState extends State<PresenceSelectionScreen> {
                             child: const Text(
                               "I'm not sure, I just need to chat",
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Color(0xFFC7B2DE),
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                               ),
