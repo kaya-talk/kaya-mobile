@@ -314,7 +314,7 @@ class _GlowNotesHomeScreenState extends State<GlowNotesHomeScreen> {
             // Do nothing, already selected
           } else if (index == 5) {
             // Profile button
-            context.pushNamed('settings');
+            context.pushNamed('profile');
           }
         },
         selectedItemColor: const Color(0xFFB6A9E5),

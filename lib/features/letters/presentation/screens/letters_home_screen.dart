@@ -282,7 +282,7 @@ class _LettersHomeScreenState extends State<LettersHomeScreen> {
             context.pushNamed('glow-notes');
           } else if (index == 5) {
             // Profile button
-            context.pushNamed('settings');
+            context.pushNamed('profile');
           }
         },
         selectedItemColor: const Color(0xFFB6A9E5),
