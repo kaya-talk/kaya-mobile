@@ -21,6 +21,7 @@ import 'package:kaya_app/features/letters/presentation/screens/letters_compose_s
 import 'package:kaya_app/features/calendar/presentation/screens/calendar_screen.dart';
 import 'package:kaya_app/features/hold_space/presentation/screens/hold_space_screen.dart';
 import 'package:kaya_app/features/settings/presentation/screens/settings_screen.dart';
+import 'package:kaya_app/features/profile/presentation/screens/profile_screen.dart';
 import 'package:kaya_app/features/import_export/presentation/screens/import_export_screen.dart';
 import 'package:kaya_app/features/auth/presentation/screens/reset_password_screen.dart';
 import 'package:kaya_app/features/auth/presentation/screens/reset_password_sent_screen.dart';
@@ -154,6 +155,13 @@ class AppRouter {
         path: '/settings',
         name: 'settings',
         builder: (context, state) => const SettingsScreen(),
+      ),
+      
+      // Profile Routes
+      GoRoute(
+        path: '/profile',
+        name: 'profile',
+        builder: (context, state) => const ProfileScreen(),
       ),
       
       // Import/Export Routes

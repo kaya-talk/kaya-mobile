@@ -182,6 +182,9 @@ class _HomeScreenState extends State<HomeScreen> {
           } else if (index == 4) {
             // Glow button - navigate to glow notes home
             context.pushNamed('glow-notes');
+          } else if (index == 5) {
+            // Profile button - navigate to profile page
+            context.pushNamed('profile');
           } else {
             setState(() {
               _selectedIndex = index;
