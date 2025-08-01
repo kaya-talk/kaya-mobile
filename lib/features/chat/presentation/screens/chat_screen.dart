@@ -139,7 +139,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   // Back button
                   GestureDetector(
-                    onTap: () => context.pop(),
+                    onTap: () => context.pushNamed('chat-history'),
                     child: const Icon(
                       Icons.arrow_back,
                       color: Colors.white,

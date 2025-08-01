@@ -170,9 +170,14 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: const Color(0xFF2E1065),
         currentIndex: _selectedIndex,
         onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
+          if (index == 1) {
+            // Talk button - navigate to chat history
+            context.pushNamed('chat-history');
+          } else {
+            setState(() {
+              _selectedIndex = index;
+            });
+          }
         },
         selectedItemColor: const Color(0xFFB6A9E5),
         unselectedItemColor: Colors.white,

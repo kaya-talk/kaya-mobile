@@ -10,6 +10,7 @@ import 'package:kaya_app/features/onboarding/presentation/screens/vibe_selector_
 import 'package:kaya_app/features/home/presentation/screens/home_screen.dart';
 import 'package:kaya_app/features/chat/presentation/screens/chat_screen.dart';
 import 'package:kaya_app/features/chat/presentation/screens/presence_selection_screen.dart';
+import 'package:kaya_app/features/chat/presentation/screens/chat_history_screen.dart';
 import 'package:kaya_app/features/journal/presentation/screens/journal_home_screen.dart';
 import 'package:kaya_app/features/journal/presentation/screens/journal_compose_screen.dart';
 import 'package:kaya_app/features/journal/presentation/screens/journal_archive_screen.dart';
@@ -86,6 +87,11 @@ class AppRouter {
         path: '/chat',
         name: 'chat',
         builder: (context, state) => ChatScreen(extra: state.extra as Map<String, dynamic>?),
+      ),
+      GoRoute(
+        path: '/chat-history',
+        name: 'chat-history',
+        builder: (context, state) => const ChatHistoryScreen(),
       ),
       
       // Journal Routes
