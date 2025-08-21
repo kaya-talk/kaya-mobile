@@ -180,9 +180,11 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
                       child: TextField(
                         controller: _titleController,
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: Colors.black,
                           fontSize: 16,
+                          fontWeight: FontWeight.w500,
                         ),
+                        cursorColor: const Color(0xFFB6A9E5),
                         decoration: const InputDecoration(
                           hintText: "Give your entry a title...",
                           hintStyle: TextStyle(
@@ -206,9 +208,11 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
                         controller: _textController,
                         maxLines: 15,
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: Colors.black,
                           fontSize: 16,
+                          fontWeight: FontWeight.w500,
                         ),
+                        cursorColor: const Color(0xFFB6A9E5),
                         decoration: const InputDecoration(
                           hintText: "Write whatever's on your mind...",
                           hintStyle: TextStyle(

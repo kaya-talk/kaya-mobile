@@ -184,9 +184,11 @@ class _LettersComposeScreenState extends State<LettersComposeScreen> {
                       child: TextField(
                         controller: _titleController,
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: Colors.black,
                           fontSize: 16,
+                          fontWeight: FontWeight.w500,
                         ),
+                        cursorColor: const Color(0xFFB6A9E5),
                         decoration: const InputDecoration(
                           hintText: "Give your letter a title...",
                           hintStyle: TextStyle(
@@ -210,9 +212,11 @@ class _LettersComposeScreenState extends State<LettersComposeScreen> {
                         controller: _textController,
                         maxLines: 8,
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: Colors.black,
                           fontSize: 16,
+                          fontWeight: FontWeight.w500,
                         ),
+                        cursorColor: const Color(0xFFB6A9E5),
                         decoration: const InputDecoration(
                           hintText: "Start with 'Dear...' or say whatever.",
                           hintStyle: TextStyle(

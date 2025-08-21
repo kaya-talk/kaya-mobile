@@ -112,15 +112,17 @@ class _GlowNotesComposeScreenState extends State<GlowNotesComposeScreen> {
                         controller: _noteController,
                         maxLines: 8,
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: Colors.black,
                           fontSize: 16,
                           height: 1.4,
+                          fontWeight: FontWeight.w500,
                         ),
+                        cursorColor: const Color(0xFFB6A9E5),
                         decoration: const InputDecoration(
                           border: InputBorder.none,
                           hintText: "You're doing better than you think...",
                           hintStyle: TextStyle(
-                            color: Colors.white70,
+                            color: Color(0xFFB6A9E5),
                             fontSize: 16,
                           ),
                         ),
