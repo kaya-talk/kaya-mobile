@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/services/journal_service.dart';
+import '../../../../core/models/journal_entry_model.dart';
 
 class JournalComposeScreen extends StatefulWidget {
   const JournalComposeScreen({super.key});
@@ -11,7 +13,9 @@ class JournalComposeScreen extends StatefulWidget {
 class _JournalComposeScreenState extends State<JournalComposeScreen> {
   final TextEditingController _textController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
+  final JournalService _journalService = JournalService();
   String? _selectedMood;
+  bool _isSaving = false;
 
   final List<String> _moodTags = [
     'Hopeful', 'Tired', 'Anxious', 'Calm', 'Reflective',
@@ -25,10 +29,61 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
     super.dispose();
   }
 
-  void _saveEntry() {
-    // TODO: Implement save functionality
-    // For now, just navigate to journal history
-    context.pushNamed('journal');
+  Future<void> _saveEntry() async {
+    // Validate input
+    if (_textController.text.trim().isEmpty) {
+      _showErrorSnackBar('Please write something in your journal entry');
+      return;
+    }
+
+    setState(() {
+      _isSaving = true;
+    });
+
+    try {
+      await _journalService.createEntry(
+        title: _titleController.text.trim().isEmpty ? '' : _titleController.text.trim(),
+        content: _textController.text.trim(),
+        mood: _selectedMood,
+        tags: _selectedMood != null ? [_selectedMood!] : null,
+      );
+
+      if (mounted) {
+        _showSuccessSnackBar('Journal entry saved successfully!');
+        // Navigate back to journal home
+        context.pushNamed('journal');
+      }
+    } catch (e) {
+      if (mounted) {
+        _showErrorSnackBar('Failed to save journal entry: ${e.toString()}');
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+      }
+    }
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _showSuccessSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   @override
@@ -236,18 +291,29 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: _saveEntry,
-                  icon: const Icon(Icons.help_outline, color: Colors.white),
-                  label: const Text(
-                    'Save Entry',
-                    style: TextStyle(
+                  onPressed: _isSaving ? null : _saveEntry,
+                  icon: _isSaving 
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : const Icon(Icons.save, color: Colors.white),
+                  label: Text(
+                    _isSaving ? 'Saving...' : 'Save Entry',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4B2996),
+                    backgroundColor: _isSaving 
+                      ? const Color(0xFF6B7280) 
+                      : const Color(0xFF4B2996),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(

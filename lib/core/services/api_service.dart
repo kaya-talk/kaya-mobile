@@ -83,6 +83,14 @@ class ApiService {
     return prefs.getString('auth_token');
   }
   
+  // Public getter for auth token
+  Future<String?> getAuthToken() async {
+    return _getAuthToken();
+  }
+  
+  // Public getter for dio instance
+  Dio get dio => _dio;
+  
   // Set auth token in shared preferences
   Future<void> _setAuthToken(String token) async {
     final prefs = await SharedPreferences.getInstance();

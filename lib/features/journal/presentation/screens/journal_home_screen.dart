@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/services/journal_service.dart';
+import '../../../../core/models/journal_entry_model.dart';
 
 class JournalHomeScreen extends StatefulWidget {
   const JournalHomeScreen({super.key});
@@ -9,27 +11,62 @@ class JournalHomeScreen extends StatefulWidget {
 }
 
 class _JournalHomeScreenState extends State<JournalHomeScreen> {
+  final JournalService _journalService = JournalService();
   String _selectedFilter = 'All Entries';
+  bool _isLoading = true;
+  List<JournalEntryModel> _entries = [];
+  String? _errorMessage;
 
-  final List<String> _filters = ['All Entries', 'Calm', 'Anxious', 'Processing'];
+  List<String> get _availableFilters {
+    final moods = _entries
+        .where((entry) => entry.mood != null && entry.mood!.isNotEmpty)
+        .map((entry) => entry.mood!)
+        .toSet()
+        .toList();
+    
+    return ['All Entries', ...moods];
+  }
 
-  final List<JournalEntry> _recentEntries = [
-    JournalEntry(
-      date: 'May 8, 2025',
-      title: 'Morning Reflections',
-      mood: 'Calm',
-    ),
-    JournalEntry(
-      date: 'May 7, 2025',
-      title: 'Untitled',
-      mood: 'Processing',
-    ),
-    JournalEntry(
-      date: 'May 5, 2025',
-      title: 'Late Night Thoughts',
-      mood: 'Anxious',
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadEntries();
+  }
+
+  Future<void> _loadEntries() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final entries = await _journalService.getEntries();
+      setState(() {
+        _entries = entries;
+        _isLoading = false;
+        // Reset filter if current selection is no longer available
+        if (!_availableFilters.contains(_selectedFilter)) {
+          _selectedFilter = 'All Entries';
+        }
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Failed to load journal entries: ${e.toString()}';
+        _isLoading = false;
+      });
+    }
+  }
+
+  List<JournalEntryModel> get _filteredEntries {
+    if (_selectedFilter == 'All Entries') {
+      return _entries;
+    }
+    return _entries.where((entry) => entry.mood == _selectedFilter).toList();
+  }
+
+  void _refreshEntries() {
+    _loadEntries();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,106 +108,48 @@ class _JournalHomeScreenState extends State<JournalHomeScreen> {
             
             // Content
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Description
-                    const Text(
-                      "You've been here before — with questions, with weight, with wonder. Each entry is a shape you gave to something that once had none.",
-                      style: TextStyle(
-                        color: Color(0xFFB6A9E5),
-                        fontSize: 15,
-                        height: 1.4,
+              child: RefreshIndicator(
+                onRefresh: _loadEntries,
+                color: const Color(0xFFB6A9E5),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Journal Title and Prompt
+                      const Text(
+                        'Journal',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      "You can reread. You can release. You can begin again.",
-                      style: TextStyle(
-                        color: Color(0xFFB6A9E5),
-                        fontSize: 15,
-                        height: 1.4,
+                      const SizedBox(height: 8),
+                      const Text(
+                        "There's no wrong way to begin.",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    
-                    // Statistics Cards
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF3B2170),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
-                                Text(
-                                  '17',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  'reflections held',
-                                  style: TextStyle(
-                                    color: Color(0xFFB6A9E5),
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
+                      const SizedBox(height: 24),
+                      
+                      // Filter Buttons
+                      if (_entries.isNotEmpty) ...[
+                        const Text(
+                          'Filter by mood:',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF3B2170),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
-                                Text(
-                                  '6 days',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  'longest streak',
-                                  style: TextStyle(
-                                    color: Color(0xFFB6A9E5),
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    
-                    // Filter Buttons
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: _filters.map((filter) => Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: GestureDetector(
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: _availableFilters.map((filter) => GestureDetector(
                             onTap: () {
                               setState(() {
                                 _selectedFilter = filter;
@@ -180,8 +159,8 @@ class _JournalHomeScreenState extends State<JournalHomeScreen> {
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               decoration: BoxDecoration(
                                 color: _selectedFilter == filter 
-                                  ? const Color(0xFF4B2996) 
-                                  : const Color(0xFF3B2170),
+                                  ? const Color(0xFFB6A9E5) 
+                                  : const Color(0xFF4B2996),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
@@ -193,76 +172,164 @@ class _JournalHomeScreenState extends State<JournalHomeScreen> {
                                 ),
                               ),
                             ),
+                          )).toList(),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+                    
+                      // Recent Entries
+                      const Text(
+                        'Recent Entries',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      
+                      // Journal Entry Cards
+                      if (_isLoading)
+                        const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(32.0),
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFB6A9E5)),
+                            ),
                           ),
-                        )).toList(),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    
-                    // Recent Entries
-                    const Text(
-                      'Recent Entries',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    
-                    // Journal Entry Cards
-                    ..._recentEntries.map((entry) => Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF3B2170),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        )
+                      else if (_errorMessage != null)
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          margin: const EdgeInsets.symmetric(vertical: 16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF3B2170),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Column(
                             children: [
+                              const Icon(
+                                Icons.error_outline,
+                                color: Colors.red,
+                                size: 32,
+                              ),
+                              const SizedBox(height: 8),
                               Text(
-                                entry.date,
+                                _errorMessage!,
                                 style: const TextStyle(
-                                  color: Color(0xFFB6A9E5),
+                                  color: Colors.white,
                                   fontSize: 14,
                                 ),
+                                textAlign: TextAlign.center,
                               ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF4B2996),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  entry.mood,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
+                              const SizedBox(height: 16),
+                              ElevatedButton(
+                                onPressed: _refreshEntries,
+                                child: const Text('Retry'),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            entry.title,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
+                        )
+                      else if (_filteredEntries.isEmpty)
+                        Container(
+                          padding: const EdgeInsets.all(32),
+                          child: const Column(
+                            children: [
+                              Icon(
+                                Icons.edit_note,
+                                color: Color(0xFFB6A9E5),
+                                size: 48,
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                'No journal entries yet',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Start your journaling journey by writing your first entry',
+                                style: TextStyle(
+                                  color: Color(0xFFB6A9E5),
+                                  fontSize: 14,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    )).toList(),
-                    
-                    const SizedBox(height: 24),
-                  ],
+                        )
+                      else
+                        ..._filteredEntries.map((entry) => Container(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF3B2170),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    entry.formattedDate,
+                                    style: const TextStyle(
+                                      color: Color(0xFFB6A9E5),
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  if (entry.mood != null)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF4B2996),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        entry.mood!,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                entry.title.isNotEmpty ? entry.title : 'Untitled',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              if (entry.content.isNotEmpty) ...[
+                                const SizedBox(height: 8),
+                                Text(
+                                  entry.content.length > 100 
+                                    ? '${entry.content.substring(0, 100)}...'
+                                    : entry.content,
+                                  style: const TextStyle(
+                                    color: Color(0xFFB6A9E5),
+                                    fontSize: 14,
+                                  ),
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ],
+                          ),
+                        )).toList(),
+                      
+                      const SizedBox(height: 24),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -297,6 +364,12 @@ class _JournalHomeScreenState extends State<JournalHomeScreen> {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.pushNamed('journal-compose'),
+        backgroundColor: const Color(0xFF4B2996),
+        foregroundColor: Colors.white,
+        child: const Icon(Icons.edit_note),
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
@@ -337,16 +410,4 @@ class _JournalHomeScreenState extends State<JournalHomeScreen> {
       ),
     );
   }
-}
-
-class JournalEntry {
-  final String date;
-  final String title;
-  final String mood;
-
-  JournalEntry({
-    required this.date,
-    required this.title,
-    required this.mood,
-  });
 } 
