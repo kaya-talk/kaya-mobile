@@ -10,6 +10,7 @@ class LettersComposeScreen extends StatefulWidget {
 
 class _LettersComposeScreenState extends State<LettersComposeScreen> {
   final TextEditingController _textController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
   String? _selectedEmotion;
 
   final List<String> _emotions = [
@@ -22,6 +23,7 @@ class _LettersComposeScreenState extends State<LettersComposeScreen> {
   @override
   void dispose() {
     _textController.dispose();
+    _titleController.dispose();
     super.dispose();
   }
 
@@ -160,6 +162,40 @@ class _LettersComposeScreenState extends State<LettersComposeScreen> {
                             ),
                           ),
                         ],
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    
+                    // Letter Title Input
+                    const Text(
+                      'Title (Optional)',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF3B2170),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: TextField(
+                        controller: _titleController,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                        decoration: const InputDecoration(
+                          hintText: "Give your letter a title...",
+                          hintStyle: TextStyle(
+                            color: Color(0xFFB6A9E5),
+                            fontSize: 16,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.all(16),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 32),

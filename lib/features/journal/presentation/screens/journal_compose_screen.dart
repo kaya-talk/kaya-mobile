@@ -10,6 +10,7 @@ class JournalComposeScreen extends StatefulWidget {
 
 class _JournalComposeScreenState extends State<JournalComposeScreen> {
   final TextEditingController _textController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
   String? _selectedMood;
 
   final List<String> _moodTags = [
@@ -20,6 +21,7 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
   @override
   void dispose() {
     _textController.dispose();
+    _titleController.dispose();
     super.dispose();
   }
 
@@ -155,6 +157,40 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
                             SizedBox(width: 4),
                             Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 16),
                           ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    
+                    // Journal Title Input
+                    const Text(
+                      'Title (Optional)',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF3B2170),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: TextField(
+                        controller: _titleController,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                        decoration: const InputDecoration(
+                          hintText: "Give your entry a title...",
+                          hintStyle: TextStyle(
+                            color: Color(0xFFB6A9E5),
+                            fontSize: 16,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.all(20),
                         ),
                       ),
                     ),
