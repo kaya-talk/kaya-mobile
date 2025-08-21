@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/services/letters_service.dart';
+import '../../../../core/models/letter_model.dart';
 
 class LettersComposeScreen extends StatefulWidget {
   const LettersComposeScreen({super.key});
@@ -11,7 +13,9 @@ class LettersComposeScreen extends StatefulWidget {
 class _LettersComposeScreenState extends State<LettersComposeScreen> {
   final TextEditingController _textController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
+  final LettersService _lettersService = LettersService();
   String? _selectedEmotion;
+  bool _isSaving = false;
 
   final List<String> _emotions = [
     'Angry',
@@ -27,16 +31,66 @@ class _LettersComposeScreenState extends State<LettersComposeScreen> {
     super.dispose();
   }
 
-  void _saveLetter() {
-    // TODO: Implement save functionality
-    // For now, just navigate to letters home
-    context.goNamed('letters');
+  Future<void> _saveLetter() async {
+    // Validate input
+    if (_textController.text.trim().isEmpty) {
+      _showErrorSnackBar('Please write something in your letter');
+      return;
+    }
+
+    setState(() {
+      _isSaving = true;
+    });
+
+    try {
+      await _lettersService.createLetter(
+        mood: _selectedEmotion,
+        subject: _titleController.text.trim().isEmpty ? null : _titleController.text.trim(),
+        content: _textController.text.trim(),
+      );
+
+      if (mounted) {
+        _showSuccessSnackBar('Letter saved successfully!');
+        // Navigate back to letters home
+        context.goNamed('letters');
+      }
+    } catch (e) {
+      if (mounted) {
+        _showErrorSnackBar('Failed to save letter: ${e.toString()}');
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+      }
+    }
   }
 
   void _letItGo() {
     // TODO: Implement let it go functionality
     // For now, just navigate to letters home
     context.goNamed('letters');
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _showSuccessSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   @override
@@ -240,9 +294,11 @@ class _LettersComposeScreenState extends State<LettersComposeScreen> {
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: _saveLetter,
+                      onPressed: _isSaving ? null : _saveLetter,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF3B2170),
+                        backgroundColor: _isSaving 
+                          ? const Color(0xFF6B7280) 
+                          : const Color(0xFF3B2170),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -250,22 +306,40 @@ class _LettersComposeScreenState extends State<LettersComposeScreen> {
                         ),
                         elevation: 0,
                       ),
-                      child: const Text(
-                        'Save as Unsent',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      child: _isSaving
+                        ? const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Text('Saving...'),
+                            ],
+                          )
+                        : const Text(
+                            'Save as Unsent',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: _letItGo,
+                      onPressed: _isSaving ? null : _letItGo,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4B2996),
+                        backgroundColor: _isSaving 
+                          ? const Color(0xFF6B7280) 
+                          : const Color(0xFF4B2996),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
