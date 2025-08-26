@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:kaya_app/core/models/kaya_model.dart';
+import 'package:kaya_app/core/providers/guide_provider.dart';
 
 class PresenceSelectionScreen extends StatefulWidget {
   const PresenceSelectionScreen({super.key});
@@ -10,6 +13,12 @@ class PresenceSelectionScreen extends StatefulWidget {
 
 class _PresenceSelectionScreenState extends State<PresenceSelectionScreen> {
   String? _selectedPresence;
+  
+  @override
+  void initState() {
+    super.initState();
+    // Guide will be loaded from the provider
+  }
 
   final List<PresenceOption> _presenceOptions = [
     PresenceOption(
@@ -78,15 +87,47 @@ class _PresenceSelectionScreenState extends State<PresenceSelectionScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Title
-                    const Text(
+                    Text(
                       'What kind of presence do you need right now?',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
                     ),
+                    
+                    const SizedBox(height: 8),
+                    
+                                         // Show selected guide info
+                     Consumer<GuideProvider>(
+                       builder: (context, guideProvider, child) {
+                         final currentGuide = guideProvider.currentGuide;
+                         if (currentGuide != null) {
+                           return Center(
+                             child: Container(
+                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                               decoration: BoxDecoration(
+                                 color: const Color(0xFF4B2996),
+                                 borderRadius: BorderRadius.circular(20),
+                               ),
+                               child: Text(
+                                 'Talking with ${currentGuide.name} (${currentGuide.description})',
+                                 style: const TextStyle(
+                                   color: Colors.white,
+                                   fontSize: 14,
+                                   fontWeight: FontWeight.w500,
+                                 ),
+                                 textAlign: TextAlign.center,
+                                 overflow: TextOverflow.ellipsis,
+                                 maxLines: 2,
+                               ),
+                             ),
+                           );
+                         }
+                         return const SizedBox.shrink();
+                       },
+                     ),
                     
                     const SizedBox(height: 16),
                     
@@ -242,8 +283,11 @@ class _PresenceSelectionScreenState extends State<PresenceSelectionScreen> {
   }
 
   void _navigateToChat(String? presence) {
-    // Navigate to chat screen with the selected presence
-    context.pushNamed('chat', extra: {'presence': presence});
+    // Navigate to chat screen with only the selected presence
+    // The guide will be loaded from the provider
+    context.pushNamed('chat', extra: {
+      'presence': presence,
+    });
   }
 }
 

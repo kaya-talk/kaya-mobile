@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kaya_app/core/theme/app_theme.dart';
+import 'package:kaya_app/core/models/kaya_model.dart';
+import 'package:kaya_app/core/providers/guide_provider.dart';
+import 'package:provider/provider.dart';
 
 class VibeSelectorScreen extends StatefulWidget {
   const VibeSelectorScreen({super.key});
@@ -425,7 +428,23 @@ class _GuideStepState extends State<_GuideStep> {
     _GuideOption('Thomas', 'Wise counselor, 58', 'assets/images/guide_thomas.png'),
   ];
 
-  void _finishOnboarding() {
+  void _finishOnboarding() async {
+    // Create the guide
+    final guide = KayaModel(
+      name: _nameController.text.trim().isEmpty ? _guides[_selectedGuide].name : _nameController.text.trim(),
+      age: _age.round(),
+      sex: _selectedGender,
+      personalityTraits: _selectedPersonalities.isEmpty 
+          ? ['Empathetic', 'Understanding'] 
+          : _selectedPersonalities.toList(),
+      customDescription: _guides[_selectedGuide].role,
+    );
+    
+    // Save the guide using the provider
+    final guideProvider = Provider.of<GuideProvider>(context, listen: false);
+    await guideProvider.updateGuide(guide);
+    
+    // Navigate to home
     context.go('/home');
   }
 

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:kaya_app/core/models/kaya_model.dart';
+import 'package:kaya_app/core/services/kaya_response_service.dart';
+import 'package:kaya_app/core/providers/guide_provider.dart';
 
 class ChatScreen extends StatefulWidget {
   final Map<String, dynamic>? extra;
@@ -20,14 +24,21 @@ class _ChatScreenState extends State<ChatScreen> {
     super.initState();
     _selectedPresence = widget.extra?['presence'];
     
-    // Add initial messages based on presence
+    // Add initial messages based on presence and current guide
     _addInitialMessages();
   }
 
   void _addInitialMessages() {
     String initialMessage = "Hi there, What's on your mind right now?";
     
-    if (_selectedPresence != null) {
+    // Always use the current guide from the provider
+    final guideProvider = Provider.of<GuideProvider>(context, listen: false);
+    final currentGuide = guideProvider.currentGuide;
+    
+    if (currentGuide != null && _selectedPresence != null) {
+      initialMessage = currentGuide.getGreeting(_selectedPresence!);
+    } else if (_selectedPresence != null) {
+      // Fallback if guide is not available
       switch (_selectedPresence) {
         case 'listener':
           initialMessage = "Hi there. I'm here to listen. What's on your mind right now?";
@@ -71,23 +82,28 @@ class _ChatScreenState extends State<ChatScreen> {
     _messageController.clear();
     setState(() {});
 
-    // Simulate Kaya's response
-    _simulateKayaResponse(message);
+    // Generate Kaya's response based on presence and properties
+    _generateKayaResponse(message);
   }
 
-  void _simulateKayaResponse(String userMessage) {
+  void _generateKayaResponse(String userMessage) {
     Future.delayed(const Duration(seconds: 1), () {
-      String response = "I understand. Tell me more about that.";
+      String response;
       
-      if (userMessage.toLowerCase().contains('tough day') || 
-          userMessage.toLowerCase().contains('bad day')) {
-        response = "I'm really sorry to hear that. Want to tell me what happened?";
-      } else if (userMessage.toLowerCase().contains('happy') || 
-                 userMessage.toLowerCase().contains('good')) {
-        response = "That's wonderful! I'm glad to hear that. What made it special?";
-      } else if (userMessage.toLowerCase().contains('sad') || 
-                 userMessage.toLowerCase().contains('upset')) {
-        response = "I'm here for you. It's okay to feel that way. What's going on?";
+      // Always use the current guide from the provider
+      final guideProvider = Provider.of<GuideProvider>(context, listen: false);
+      final currentGuide = guideProvider.currentGuide;
+      
+      if (currentGuide != null && _selectedPresence != null) {
+        // Use the new response service for tailored responses
+        response = KayaResponseService.generateResponse(
+          userMessage: userMessage,
+          presence: _selectedPresence!,
+          kaya: currentGuide,
+        );
+      } else {
+        // Fallback to simple responses if guide is not available
+        response = _getFallbackResponse(userMessage);
       }
 
       setState(() {
@@ -98,6 +114,20 @@ class _ChatScreenState extends State<ChatScreen> {
         ));
       });
     });
+  }
+
+  String _getFallbackResponse(String userMessage) {
+    final lowerMessage = userMessage.toLowerCase();
+    
+    if (lowerMessage.contains('tough day') || lowerMessage.contains('bad day')) {
+      return "I'm really sorry to hear that. Want to tell me what happened?";
+    } else if (lowerMessage.contains('happy') || lowerMessage.contains('good')) {
+      return "That's wonderful! I'm glad to hear that. What made it special?";
+    } else if (lowerMessage.contains('sad') || lowerMessage.contains('upset')) {
+      return "I'm here for you. It's okay to feel that way. What's going on?";
+    }
+    
+    return "I understand. Tell me more about that.";
   }
 
   @override
@@ -127,14 +157,32 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
-                    child: Text(
-                      'Kaya',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
+                  Expanded(
+                    child: Consumer<GuideProvider>(
+                      builder: (context, guideProvider, child) {
+                        final currentGuide = guideProvider.currentGuide;
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              currentGuide?.name ?? 'Kaya',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            if (currentGuide != null)
+                              Text(
+                                currentGuide.description,
+                                style: const TextStyle(
+                                  color: Color(0xFFB6A9E5),
+                                  fontSize: 12,
+                                ),
+                              ),
+                          ],
+                        );
+                      },
                     ),
                   ),
                   // Back button

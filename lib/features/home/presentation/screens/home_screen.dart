@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:kaya_app/core/providers/auth_provider.dart';
 import 'package:kaya_app/core/theme/app_theme.dart';
+import 'package:kaya_app/core/providers/guide_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,6 +15,13 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   String? _selectedMood; // Track selected mood
+  
+  // Handle Talk to Kaya action
+  void _handleTalkToKaya() {
+    // Navigate directly to presence selection
+    // The guide will be loaded from the provider
+    context.pushNamed('presence-selection');
+  }
 
   final List<_NavItem> _navItems = [
     _NavItem(Icons.home, 'Home'),
@@ -41,29 +49,58 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Consumer<AuthProvider>(
-                    builder: (context, authProvider, child) {
-                      final name = authProvider.user?.displayName ?? '';
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Hi $name', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600)),
-                          const SizedBox(height: 2),
-                          const Text('Welcome back', style: TextStyle(color: Color(0xFFB6A9E5), fontSize: 14)),
-                        ],
-                      );
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.notifications_none, color: Colors.white),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
+                             // Header
+               Row(
+                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                 crossAxisAlignment: CrossAxisAlignment.start,
+                 children: [
+                   Expanded(
+                     child: Consumer<AuthProvider>(
+                       builder: (context, authProvider, child) {
+                         final name = authProvider.user?.displayName ?? '';
+                         return Column(
+                           crossAxisAlignment: CrossAxisAlignment.start,
+                           children: [
+                             Text(
+                               'Hi $name', 
+                               style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+                               overflow: TextOverflow.ellipsis,
+                             ),
+                             const SizedBox(height: 2),
+                             Consumer<GuideProvider>(
+                               builder: (context, guideProvider, child) {
+                                 final guide = guideProvider.currentGuide;
+                                 if (guide != null) {
+                                   return Text(
+                                     guideProvider.getPersonalizedGreeting('welcome'),
+                                     style: const TextStyle(color: Color(0xFFB6A9E5), fontSize: 14),
+                                     overflow: TextOverflow.ellipsis,
+                                     maxLines: 2,
+                                   );
+                                 }
+                                 return const Text(
+                                   'Welcome back',
+                                   style: const TextStyle(color: Color(0xFFB6A9E5), fontSize: 14),
+                                   overflow: TextOverflow.ellipsis,
+                                 );
+                               },
+                             ),
+                           ],
+                         );
+                       },
+                     ),
+                   ),
+                   const SizedBox(width: 8),
+                   IconButton(
+                     icon: const Icon(Icons.notifications_none, color: Colors.white),
+                     onPressed: () {},
+                     constraints: const BoxConstraints(
+                       minWidth: 48,
+                       minHeight: 48,
+                     ),
+                   ),
+                 ],
+               ),
               const SizedBox(height: 24),
               // Mood check-in
               const Text('How are you feeling?', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w600)),
@@ -91,9 +128,88 @@ class _HomeScreenState extends State<HomeScreen> {
                   )).toList(),
                 ),
               ),
-              const SizedBox(height: 28),
-              // Quick actions
-              const Text('Would you like to...', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600)),
+                             const SizedBox(height: 28),
+               
+                               // Guide Info Section
+                Consumer<GuideProvider>(
+                  builder: (context, guideProvider, child) {
+                    final guide = guideProvider.currentGuide;
+                    if (guide != null) {
+                      return Container(
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF4B2996),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: const Color(0xFFB6A9E5), width: 1),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF2E1065),
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                              child: Icon(
+                                guide.sex == 'Female' ? Icons.person : Icons.person_outline,
+                                color: const Color(0xFFB6A9E5),
+                                size: 24,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Your Guide: ${guide.name}',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    guide.description,
+                                    style: const TextStyle(
+                                      color: Color(0xFFB6A9E5),
+                                      fontSize: 14,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            IconButton(
+                              onPressed: () {
+                                // TODO: Navigate to guide settings/profile
+                              },
+                              icon: const Icon(
+                                Icons.settings,
+                                color: Color(0xFFB6A9E5),
+                                size: 20,
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 40,
+                                minHeight: 40,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+               
+               // Quick actions
+               const Text('Would you like to...', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600)),
               const SizedBox(height: 16),
               GridView.count(
                 shrinkWrap: true,
@@ -103,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 childAspectRatio: 1.3,
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  _QuickAction(icon: Icons.chat_bubble_outline, label: 'Talk to Kaya', onTap: () => context.pushNamed('presence-selection')),
+                  _QuickAction(icon: Icons.chat_bubble_outline, label: 'Talk to Kaya', onTap: _handleTalkToKaya),
                   _QuickAction(icon: Icons.edit_note, label: 'Write Journal', onTap: () => context.pushNamed('journal-compose')),
                   _QuickAction(icon: Icons.favorite_border, label: 'Write Glow Note', onTap: () => context.pushNamed('glow-notes-compose')),
                   _QuickAction(icon: Icons.mail_outline, label: 'Write Letter', onTap: () => context.pushNamed('letters-compose')),
@@ -127,29 +243,56 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              // Today's Insight
-              Container(
-                width: double.infinity,
-                margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF3B2170),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Icon(Icons.lightbulb_outline, color: Color(0xFFB6A9E5)),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        '"Take a deep breath. Remember that each moment is a chance to begin again. You\'re doing better than you think."',
-                        style: TextStyle(color: Colors.white, fontSize: 15),
+                                                           // Today's Insight
+                Consumer<GuideProvider>(
+                  builder: (context, guideProvider, child) {
+                    final guide = guideProvider.currentGuide;
+                    String insight = '"Take a deep breath. Remember that each moment is a chance to begin again. You\'re doing better than you think."';
+                    
+                    if (guide != null) {
+                      final style = guideProvider.getResponseStyle('insight');
+                      switch (style) {
+                        case 'empathetic':
+                          insight = '"I want you to know that your feelings are valid, and it\'s okay to not be okay sometimes. You\'re doing better than you think."';
+                          break;
+                        case 'analytical':
+                          insight = '"Every challenge you face is an opportunity to grow. Let\'s break down what\'s happening and find a way forward together."';
+                          break;
+                        case 'creative':
+                          insight = '"Sometimes we need to look at things from a different angle. What if we approached this situation with curiosity instead of fear?"';
+                          break;
+                        case 'practical':
+                          insight = '"Let\'s focus on one small step you can take today. Progress happens one moment at a time."';
+                          break;
+                      }
+                    }
+                    
+                    return Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF3B2170),
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                    ),
-                  ],
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(Icons.lightbulb_outline, color: const Color(0xFFB6A9E5)),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              insight,
+                              style: const TextStyle(color: Colors.white, fontSize: 15),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 3,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
-              ),
               // Mood Journey
               Container(
                 width: double.infinity,

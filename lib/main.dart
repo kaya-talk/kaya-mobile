@@ -7,6 +7,7 @@ import 'package:kaya_app/core/theme/app_theme.dart';
 import 'package:kaya_app/core/providers/auth_provider.dart';
 import 'package:kaya_app/core/providers/theme_provider.dart';
 import 'package:kaya_app/core/providers/user_provider.dart';
+import 'package:kaya_app/core/providers/guide_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,6 +39,7 @@ class KayaApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => GuideProvider()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
@@ -49,6 +51,12 @@ class KayaApp extends StatelessWidget {
             themeMode: themeProvider.themeMode,
             routerConfig: AppRouter.router,
             builder: (context, child) {
+              // Initialize guide provider when the app builds
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                final guideProvider = Provider.of<GuideProvider>(context, listen: false);
+                guideProvider.initialize();
+              });
+              
               return MediaQuery(
                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                 child: child!,
