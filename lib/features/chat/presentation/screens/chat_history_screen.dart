@@ -147,7 +147,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                         ),
                         child: TextField(
                           controller: _searchController,
-                          style: const TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             hintText: 'Search conversations...',
                             hintStyle: const TextStyle(color: Color(0xFFB6A9E5)),
