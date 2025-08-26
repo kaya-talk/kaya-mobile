@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kaya_app/core/theme/app_theme.dart';
 
 class ImportExportScreen extends StatelessWidget {
@@ -47,6 +48,43 @@ class ImportExportScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: const Color(0xFF2E1065),
+        currentIndex: 5, // Profile tab is selected (since import/export is accessed from profile)
+        onTap: (index) {
+          if (index == 0) {
+            // Home button
+            context.goNamed('home');
+          } else if (index == 1) {
+            // Talk button
+            context.pushNamed('chat-history');
+          } else if (index == 2) {
+            // Journal button
+            context.pushNamed('journal');
+          } else if (index == 3) {
+            // Letters button
+            context.pushNamed('letters');
+          } else if (index == 4) {
+            // Glow button
+            context.pushNamed('glow-notes');
+          } else if (index == 5) {
+            // Profile button
+            context.goNamed('profile');
+          }
+        },
+        selectedItemColor: const Color(0xFFB6A9E5),
+        unselectedItemColor: Colors.white,
+        showUnselectedLabels: true,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), label: 'Talk'),
+          BottomNavigationBarItem(icon: Icon(Icons.edit_note), label: 'Journal'),
+          BottomNavigationBarItem(icon: Icon(Icons.mail_outline), label: 'Letters'),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: 'Glow'),
+          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
+        ],
       ),
     );
   }

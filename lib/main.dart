@@ -8,6 +8,7 @@ import 'package:kaya_app/core/providers/auth_provider.dart';
 import 'package:kaya_app/core/providers/theme_provider.dart';
 import 'package:kaya_app/core/providers/user_provider.dart';
 import 'package:kaya_app/core/providers/guide_provider.dart';
+import 'package:kaya_app/core/providers/chat_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +41,7 @@ class KayaApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => GuideProvider()),
+        ChangeNotifierProvider(create: (_) => ChatProvider()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {

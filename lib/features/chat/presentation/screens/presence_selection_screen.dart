@@ -284,7 +284,7 @@ class _PresenceSelectionScreenState extends State<PresenceSelectionScreen> {
 
   void _navigateToChat(String? presence) {
     // Navigate to chat screen with only the selected presence
-    // The guide will be loaded from the provider
+    // The guide will be loaded from the provider and conversation will be created
     context.pushNamed('chat', extra: {
       'presence': presence,
     });

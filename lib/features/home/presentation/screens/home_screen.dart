@@ -216,7 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisCount: 2,
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
-                childAspectRatio: 1.3,
+                childAspectRatio: 1.2, // Slightly reduced to prevent overflow
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
                   _QuickAction(icon: Icons.chat_bubble_outline, label: 'Talk to Kaya', onTap: _handleTalkToKaya),
@@ -231,7 +231,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: double.infinity,
                 margin: const EdgeInsets.only(bottom: 12),
                 child: ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () => context.pushNamed('hold-space'),
                   icon: const Icon(Icons.nightlight_round, color: Color(0xFFB6A9E5)),
                   label: const Text('Hold Space', style: TextStyle(color: Colors.white, fontSize: 16)),
                   style: ElevatedButton.styleFrom(
@@ -303,9 +303,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Text('Your Mood Journey', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
-                    const Spacer(),
+                    Expanded(
+                      child: Text(
+                        'Your Mood Journey', 
+                        style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
                     Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: List.generate(5, (i) => const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 2),
                         child: Icon(Icons.circle, size: 12, color: Color(0xFFB6A9E5)),

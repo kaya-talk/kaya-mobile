@@ -4,6 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:kaya_app/core/models/kaya_model.dart';
 import 'package:kaya_app/core/services/kaya_response_service.dart';
 import 'package:kaya_app/core/providers/guide_provider.dart';
+import 'package:kaya_app/core/providers/chat_provider.dart';
+import 'package:kaya_app/core/models/chat_conversation.dart';
+import 'package:kaya_app/core/models/chat_message.dart';
 
 class ChatScreen extends StatefulWidget {
   final Map<String, dynamic>? extra;
@@ -16,24 +19,88 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
-  final List<ChatMessage> _messages = [];
+  String? _conversationId;
   String? _selectedPresence;
+  bool _isNewConversation = false;
 
   @override
   void initState() {
     super.initState();
+    _conversationId = widget.extra?['conversationId'];
     _selectedPresence = widget.extra?['presence'];
     
-    // Add initial messages based on presence and current guide
-    _addInitialMessages();
+    // Use post frame callback to avoid calling setState during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_conversationId != null) {
+        // Load existing conversation
+        _loadConversation();
+      } else if (_selectedPresence != null) {
+        // Create new conversation
+        _createNewConversation();
+      }
+    });
   }
 
-  void _addInitialMessages() {
-    String initialMessage = "Hi there, What's on your mind right now?";
-    
-    // Always use the current guide from the provider
+  Future<void> _loadConversation() async {
+    final chatProvider = context.read<ChatProvider>();
+    await chatProvider.setCurrentConversation(_conversationId!);
+  }
+
+  Future<void> _createNewConversation() async {
     final guideProvider = Provider.of<GuideProvider>(context, listen: false);
     final currentGuide = guideProvider.currentGuide;
+    
+    if (currentGuide == null) return;
+    
+    // Generate conversation title based on presence
+    String title = 'New Conversation';
+    switch (_selectedPresence) {
+      case 'listener':
+        title = 'Listening Session';
+        break;
+      case 'friend':
+        title = 'Friendly Chat';
+        break;
+      case 'therapist':
+        title = 'Therapeutic Session';
+        break;
+      case 'coach':
+        title = 'Coaching Session';
+        break;
+    }
+    
+    final chatProvider = context.read<ChatProvider>();
+    final conversation = await chatProvider.createConversation(
+      title: title,
+      presence: _selectedPresence!,
+      guide: currentGuide,
+    );
+    
+    if (conversation != null) {
+      print('Conversation created, adding initial greeting...');
+      // Add initial greeting BEFORE updating the UI state
+      await _addInitialGreeting();
+      print('Initial greeting added, updating UI state...');
+      
+      // Don't call setCurrentConversation again as it will overwrite the messages we just added
+      print('Messages should now be available in the provider');
+      
+      // Now update the UI state after the greeting is added
+      setState(() {
+        _conversationId = conversation.id;
+        _isNewConversation = true;
+      });
+      print('UI state updated, conversation ID: $_conversationId');
+    }
+  }
+
+  Future<void> _addInitialGreeting() async {
+    final guideProvider = Provider.of<GuideProvider>(context, listen: false);
+    final currentGuide = guideProvider.currentGuide;
+    
+    if (currentGuide == null || _selectedPresence == null) return;
+    
+    String initialMessage = "Hi there, What's on your mind right now?";
     
     if (currentGuide != null && _selectedPresence != null) {
       initialMessage = currentGuide.getGreeting(_selectedPresence!);
@@ -55,11 +122,10 @@ class _ChatScreenState extends State<ChatScreen> {
       }
     }
     
-    _messages.add(ChatMessage(
-      text: initialMessage,
-      isFromUser: false,
-      timestamp: DateTime.now(),
-    ));
+    print('Adding initial greeting: $initialMessage');
+    final chatProvider = context.read<ChatProvider>();
+    await chatProvider.addAIResponse(initialMessage, presence: _selectedPresence);
+    print('Initial greeting added successfully');
   }
 
   @override
@@ -68,52 +134,46 @@ class _ChatScreenState extends State<ChatScreen> {
     super.dispose();
   }
 
-  void _sendMessage() {
+  Future<void> _sendMessage() async {
     final message = _messageController.text.trim();
-    if (message.isEmpty) return;
-
-    // Add user message
-    _messages.add(ChatMessage(
-      text: message,
-      isFromUser: true,
-      timestamp: DateTime.now(),
-    ));
+    if (message.isEmpty || _conversationId == null) return;
 
     _messageController.clear();
-    setState(() {});
 
-    // Generate Kaya's response based on presence and properties
-    _generateKayaResponse(message);
+    // Send message via chat provider
+    final chatProvider = context.read<ChatProvider>();
+    final success = await chatProvider.sendMessage(message, presence: _selectedPresence);
+    
+    if (success) {
+      // Generate AI response
+      await _generateKayaResponse(message);
+    }
   }
 
-  void _generateKayaResponse(String userMessage) {
-    Future.delayed(const Duration(seconds: 1), () {
-      String response;
-      
-      // Always use the current guide from the provider
-      final guideProvider = Provider.of<GuideProvider>(context, listen: false);
-      final currentGuide = guideProvider.currentGuide;
-      
-      if (currentGuide != null && _selectedPresence != null) {
-        // Use the new response service for tailored responses
-        response = KayaResponseService.generateResponse(
-          userMessage: userMessage,
-          presence: _selectedPresence!,
-          kaya: currentGuide,
-        );
-      } else {
-        // Fallback to simple responses if guide is not available
-        response = _getFallbackResponse(userMessage);
-      }
+  Future<void> _generateKayaResponse(String userMessage) async {
+    await Future.delayed(const Duration(seconds: 1));
+    
+    String response;
+    
+    // Always use the current guide from the provider
+    final guideProvider = Provider.of<GuideProvider>(context, listen: false);
+    final currentGuide = guideProvider.currentGuide;
+    
+    if (currentGuide != null && _selectedPresence != null) {
+      // Use the new response service for tailored responses
+      response = KayaResponseService.generateResponse(
+        userMessage: userMessage,
+        presence: _selectedPresence!,
+        kaya: currentGuide,
+      );
+    } else {
+      // Fallback to simple responses if guide is not available
+      response = _getFallbackResponse(userMessage);
+    }
 
-      setState(() {
-        _messages.add(ChatMessage(
-          text: response,
-          isFromUser: false,
-          timestamp: DateTime.now(),
-        ));
-      });
-    });
+    // Add AI response via chat provider
+    final chatProvider = context.read<ChatProvider>();
+    await chatProvider.addAIResponse(response, presence: _selectedPresence);
   }
 
   String _getFallbackResponse(String userMessage) {
@@ -198,62 +258,91 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
             
-            // Chat messages
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: _messages.length,
-                itemBuilder: (context, index) {
-                  final message = _messages[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Row(
-                      mainAxisAlignment: message.isFromUser 
-                          ? MainAxisAlignment.end 
-                          : MainAxisAlignment.start,
-                      children: [
-                        if (!message.isFromUser) ...[
-                          // Kaya avatar for their messages
-                          Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF4B2996),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: const Icon(
-                              Icons.person,
-                              color: Colors.white,
-                              size: 18,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                        ],
-                        
-                        // Message bubble
-                        Flexible(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                            decoration: BoxDecoration(
-                              color: message.isFromUser 
-                                  ? const Color(0xFF4B2996)
-                                  : const Color(0xFF3B2170),
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                            child: Text(
-                              message.text,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
+                         // Chat messages
+             Expanded(
+               child: Consumer<ChatProvider>(
+                 builder: (context, chatProvider, child) {
+                   final messages = chatProvider.currentMessages;
+                   final isLoading = chatProvider.isLoading;
+                   
+                   print('ChatScreen build - Messages count: ${messages.length}, Loading: $isLoading, Conversation ID: $_conversationId');
+                    
+                   if (messages.isEmpty && isLoading) {
+                     return const Center(
+                       child: CircularProgressIndicator(
+                         color: Color(0xFFB6A9E5),
+                       ),
+                     );
+                   }
+                   
+                   if (messages.isEmpty && !isLoading) {
+                     return const Center(
+                       child: Text(
+                         'Starting conversation...',
+                         style: TextStyle(
+                           color: Color(0xFFB6A9E5),
+                           fontSize: 16,
+                         ),
+                       ),
+                     );
+                   }
+                  
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) {
+                      final message = messages[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: Row(
+                          mainAxisAlignment: message.isFromUser 
+                              ? MainAxisAlignment.end 
+                              : MainAxisAlignment.start,
+                          children: [
+                            if (!message.isFromUser) ...[
+                              // Kaya avatar for their messages
+                              Container(
+                                width: 32,
+                                height: 32,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF4B2996),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: const Icon(
+                                  Icons.person,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                            ],
+                            
+                            // Message bubble
+                            Flexible(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: message.isFromUser 
+                                      ? const Color(0xFF4B2996)
+                                      : const Color(0xFF3B2170),
+                                  borderRadius: BorderRadius.circular(18),
+                                ),
+                                child: Text(
+                                  message.text,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   );
                 },
               ),
@@ -315,14 +404,4 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 }
 
-class ChatMessage {
-  final String text;
-  final bool isFromUser;
-  final DateTime timestamp;
-
-  ChatMessage({
-    required this.text,
-    required this.isFromUser,
-    required this.timestamp,
-  });
-} 
+ 
