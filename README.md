@@ -1,6 +1,6 @@
-# kaya_app
+# Kaya Talk Mental Health App
 
-A new Flutter project.
+A Flutter project.
 
 
 https://github.com/user-attachments/assets/6d2626a9-7f1f-4486-993e-78de1a4c1464
